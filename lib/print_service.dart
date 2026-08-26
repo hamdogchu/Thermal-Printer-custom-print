@@ -76,7 +76,7 @@ class PrintService {
     return true;
   }
 
-  Future<bool> printImageBytes(ByteData imageData) async {
+  Future<bool> printImageBytes(ByteData imageData, {double brightness = 1.0}) async {
     if (selectedPrinter == null) return false;
 
     try {
@@ -105,7 +105,7 @@ class PrintService {
       for (int y = 0; y < dithered.height; y++) {
         for (int x = 0; x < dithered.width; x++) {
           final pixel = dithered.getPixel(x, y);
-          num oldPixel = pixel.r;
+          num oldPixel = (pixel.r * brightness).clamp(0, 255);
           num newPixel = oldPixel < 128 ? 0 : 255;
           
           pixel.r = newPixel;

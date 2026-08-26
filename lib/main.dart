@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   
   List<PrinterDevice> _devices = [];
   bool _isScanning = false;
+  double _brightness = 1.2;
   
   final List<String> _premadeImages = [
     'assets/images/cafe_logo.jpg',
@@ -110,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _printImageData(ByteData data) async {
+  void _printImageData(ByteData data, {double brightness = 1.0}) async {
     if (_printService.selectedPrinter == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please connect to a printer first')),
@@ -119,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     
     try {
-      bool success = await _printService.printImageBytes(data);
+      bool success = await _printService.printImageBytes(data, brightness: brightness);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(success ? 'Printed successfully' : 'Failed to print')),
@@ -232,7 +233,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Select Premade Image', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  const SizedBox(height: 16),
+                  
+                  // Brightness Slider
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.brightness_medium),
+                      const SizedBox(width: 8),
+                      const Text('Brightness:'),
+                      Expanded(
+                        child: Slider(
+                          value: _brightness,
+                          min: 0.5,
+                          max: 2.0,
+                          divisions: 15,
+                          label: _brightness.toStringAsFixed(1),
+                          onChanged: (value) {
+                            setState(() {
+                              _brightness = value;
+                            });
+                          },
+                        ),
+                      ),
+                      Text('${(_brightness * 100).toInt()}%'),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 8),
                   Expanded(
                     child: GridView.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -302,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 final ByteData data = await rootBundle.load(imagePath);
-                _printImageData(data);
+                _printImageData(data, brightness: _brightness);
               },
               child: const Text('Print'),
             ),
@@ -334,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                _printImageData(data);
+                _printImageData(data, brightness: _brightness);
               },
               child: const Text('Print'),
             ),

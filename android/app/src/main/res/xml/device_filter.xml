@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- We can specify vendor-id and product-id if we want, but letting it be empty means we can attach to any USB device for testing -->
+    <!-- XPrinter T80A generic USB class: -->
+    <usb-device class="7" subclass="1" protocol="2"/>
+    <usb-device />
+</resources>
